@@ -1,0 +1,28 @@
+services:
+  todo-service:
+    build: .
+    image: localhost:5000/todo-service:0.0.1-SNAPSHOT
+    depends_on:
+      - "cassandra"
+    command: ["./wait-for-it.sh cassandra:9042 --strict --timeout=30 && ./startApp.sh"]
+    deploy:
+      resources:
+        reservations:
+          memory: 500M
+    environment:
+      SPRING_PROFILES_ACTIVE: test
+    ports:
+      - "8080:8080"
+    volumes:
+      - logvolume01:/var/log
+  cassandra:
+    image: cassandra
+    ports:
+      - "9042:9042"
+  registry:
+    restart: always
+    image: registry:2
+    ports:
+      - 5000:5000
+volumes:
+  logvolume01: {}
